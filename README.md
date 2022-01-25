@@ -1,6 +1,6 @@
 # Inertia.js Go Adapter
 
-[![Build Status](https://github.com/petaki/inertia-go/workflows/tests/badge.svg)](https://github.com/petaki/inertia-go/actions)
+[![Build Status](https://github.com/seagyn/inertia-fiber/workflows/tests/badge.svg)](https://github.com/seagyn/inertia-fiber/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE.md)
 
 The Inertia.js server-side adapter for Go. Visit [inertiajs.com](https://inertiajs.com) to learn more.
@@ -10,7 +10,7 @@ The Inertia.js server-side adapter for Go. Visit [inertiajs.com](https://inertia
 Install the package using the `go get` command:
 
 ```
-go get github.com/petaki/inertia-go
+go get github.com/seagyn/inertia-fiber
 ```
 
 ## Usage
