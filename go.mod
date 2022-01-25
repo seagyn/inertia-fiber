@@ -1,3 +1,3 @@
-module github.com/petaki/inertia-go
+module github.com/seagyn/inertia-fiber
 
 go 1.17
