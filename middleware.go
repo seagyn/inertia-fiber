@@ -1,23 +1,20 @@
 package inertia
 
-import "net/http"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
-// Middleware function.
-func (i *Inertia) Middleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-Inertia") == "" {
-			next.ServeHTTP(w, r)
+func (i *Inertia) Middleware(c *fiber.Ctx) error {
+	if c.Get("X-Inertia") == "" {
+		return c.Next()
+	}
 
-			return
-		}
+	if c.Method() == "GET" && c.Get("X-Inertia-Version") != i.version {
+		c.Set("X-Inertia-Location", i.url+c.OriginalURL())
 
-		if r.Method == "GET" && r.Header.Get("X-Inertia-Version") != i.version {
-			w.Header().Set("X-Inertia-Location", i.url+r.RequestURI)
-			w.WriteHeader(http.StatusConflict)
+		return c.SendStatus(fiber.StatusConflict)
+	}
 
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
+	// Go to next middleware:
+	return c.Next()
 }

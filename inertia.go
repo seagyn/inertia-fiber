@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // Inertia type.
@@ -87,11 +89,11 @@ func (i *Inertia) WithViewData(ctx context.Context, key string, value interface{
 }
 
 // Render function.
-func (i *Inertia) Render(w http.ResponseWriter, r *http.Request, component string, props map[string]interface{}) error {
+func (i *Inertia) Render(c *fiber.Ctx, component string, props map[string]interface{}) error {
 	only := make(map[string]string)
-	partial := r.Header.Get("X-Inertia-Partial-Data")
+	partial := c.Get("X-Inertia-Partial-Data")
 
-	if partial != "" && r.Header.Get("X-Inertia-Partial-Component") == component {
+	if partial != "" && c.Get("X-Inertia-Partial-Component") == component {
 		for _, value := range strings.Split(partial, ",") {
 			only[value] = value
 		}
@@ -100,7 +102,8 @@ func (i *Inertia) Render(w http.ResponseWriter, r *http.Request, component strin
 	page := &Page{
 		Component: component,
 		Props:     make(map[string]interface{}),
-		URL:       r.RequestURI,
+		Routes:    flattenRoutes(c.App().Stack()),
+		URL:       c.OriginalURL(),
 		Version:   i.version,
 	}
 
@@ -110,7 +113,7 @@ func (i *Inertia) Render(w http.ResponseWriter, r *http.Request, component strin
 		}
 	}
 
-	contextProps := r.Context().Value(ContextKeyProps)
+	contextProps := c.Context().Value(ContextKeyProps)
 
 	if contextProps != nil {
 		contextProps, ok := contextProps.(map[string]interface{})
@@ -131,26 +134,21 @@ func (i *Inertia) Render(w http.ResponseWriter, r *http.Request, component strin
 		}
 	}
 
-	if r.Header.Get("X-Inertia") != "" {
+	if c.Get("X-Inertia") != "" {
 		js, err := json.Marshal(page)
 		if err != nil {
 			return err
 		}
 
-		w.Header().Set("Vary", "Accept")
-		w.Header().Set("X-Inertia", "true")
-		w.Header().Set("Content-Type", "application/json")
+		c.Set("Vary", "Accept")
+		c.Set("X-Inertia", "true")
+		c.Set("Content-Type", "application/json")
 
-		_, err = w.Write(js)
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return c.Send(js)
 	}
 
 	viewData := make(map[string]interface{})
-	contextViewData := r.Context().Value(ContextKeyViewData)
+	contextViewData := c.Context().Value(ContextKeyViewData)
 
 	if contextViewData != nil {
 		contextViewData, ok := contextViewData.(map[string]interface{})
@@ -170,9 +168,9 @@ func (i *Inertia) Render(w http.ResponseWriter, r *http.Request, component strin
 		return err
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	c.Set("Content-Type", "text/html")
 
-	err = ts.Execute(w, viewData)
+	err = ts.Execute(c.Response().BodyWriter(), viewData)
 	if err != nil {
 		return err
 	}
@@ -194,4 +192,16 @@ func (i *Inertia) createRootTemplate() (*template.Template, error) {
 	}
 
 	return ts.ParseFiles(i.rootTemplate)
+}
+
+func flattenRoutes(r [][]*fiber.Route) []*fiber.Route {
+	routes := []*fiber.Route{}
+
+	for _, routeGroup := range r {
+		for _, route := range routeGroup {
+			routes = append(routes, route)
+		}
+	}
+
+	return routes
 }
