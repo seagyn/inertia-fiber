@@ -134,6 +134,8 @@ func (i *Inertia) Render(c *fiber.Ctx, component string, props map[string]interf
 		}
 	}
 
+	page.Props["params"] = c.AllParams()
+
 	if c.Get("X-Inertia") != "" {
 		js, err := json.Marshal(page)
 		if err != nil {
