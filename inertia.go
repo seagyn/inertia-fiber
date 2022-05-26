@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 // Inertia type.
@@ -18,19 +17,17 @@ type Inertia struct {
 	url           string
 	rootTemplate  string
 	version       string
-	store         *session.Store
 	sharedProps   map[string]interface{}
 	sharedFuncMap template.FuncMap
 	templateFS    fs.FS
 }
 
 // New function.
-func New(url, rootTemplate, version string, store *session.Store) *Inertia {
+func New(url, rootTemplate, version string) *Inertia {
 	i := new(Inertia)
 	i.url = url
 	i.rootTemplate = rootTemplate
 	i.version = version
-	i.store = store
 	i.sharedProps = make(map[string]interface{})
 	i.sharedFuncMap = template.FuncMap{"marshal": marshal}
 
@@ -38,8 +35,8 @@ func New(url, rootTemplate, version string, store *session.Store) *Inertia {
 }
 
 // NewWithFS function.
-func NewWithFS(url, rootTemplate, version string, store *session.Store, templateFS fs.FS) *Inertia {
-	i := New(url, rootTemplate, version, store)
+func NewWithFS(url, rootTemplate, version string, templateFS fs.FS) *Inertia {
+	i := New(url, rootTemplate, version)
 	i.templateFS = templateFS
 
 	return i
