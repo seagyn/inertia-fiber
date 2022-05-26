@@ -38,7 +38,7 @@ func New(url, rootTemplate, version string, store *session.Store) *Inertia {
 }
 
 // NewWithFS function.
-func NewWithFS(url, rootTemplate, version string, store session.Session, templateFS fs.FS) *Inertia {
+func NewWithFS(url, rootTemplate, version string, store *session.Store, templateFS fs.FS) *Inertia {
 	i := New(url, rootTemplate, version, store)
 	i.templateFS = templateFS
 
