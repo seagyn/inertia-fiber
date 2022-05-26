@@ -17,10 +17,11 @@ func (i *Inertia) Middleware(c *fiber.Ctx) error {
 
 	sess, _ := i.store.Get(c)
 
-	message := sess.Get("message")
+	flash := sess.Get("flash")
 
-	if message != nil {
-		i.Share("message", sess.Get("message"))
+	if flash != nil {
+		i.Share("flash", flash)
+		sess.Delete("flash")
 	}
 
 	// Go to next middleware:
