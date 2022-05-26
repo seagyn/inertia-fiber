@@ -15,11 +15,13 @@ func (i *Inertia) Middleware(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusConflict)
 	}
 
-	message := i.session.Get("message")
+	sess, _ := i.store.Get(c)
+
+	message := sess.Get("message")
 
 	if message != nil {
-		i.Share("message", i.session.Get("message"))
-		i.session.Delete("message")
+		i.Share("message", sess.Get("message"))
+		sess.Delete("message")
 	}
 
 	// Go to next middleware:

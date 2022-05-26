@@ -18,19 +18,19 @@ type Inertia struct {
 	url           string
 	rootTemplate  string
 	version       string
-	session       *session.Session
+	store         *session.Store
 	sharedProps   map[string]interface{}
 	sharedFuncMap template.FuncMap
 	templateFS    fs.FS
 }
 
 // New function.
-func New(url, rootTemplate, version string, session *session.Session) *Inertia {
+func New(url, rootTemplate, version string, store *session.Store) *Inertia {
 	i := new(Inertia)
 	i.url = url
 	i.rootTemplate = rootTemplate
 	i.version = version
-	i.session = session
+	i.store = store
 	i.sharedProps = make(map[string]interface{})
 	i.sharedFuncMap = template.FuncMap{"marshal": marshal}
 
@@ -38,8 +38,8 @@ func New(url, rootTemplate, version string, session *session.Session) *Inertia {
 }
 
 // NewWithFS function.
-func NewWithFS(url, rootTemplate, version string, session *session.Session, templateFS fs.FS) *Inertia {
-	i := New(url, rootTemplate, version, session)
+func NewWithFS(url, rootTemplate, version string, store *session.Store, templateFS fs.FS) *Inertia {
+	i := New(url, rootTemplate, version, store)
 	i.templateFS = templateFS
 
 	return i
