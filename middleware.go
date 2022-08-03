@@ -19,9 +19,15 @@ func (i *Inertia) Middleware(c *fiber.Ctx) error {
 
 	flash := sess.Get("flash")
 
+	i.Share("flash", nil)
+
 	if flash != nil {
 		i.Share("flash", flash)
 		sess.Delete("flash")
+
+		if err := sess.Save(); err != nil {
+			panic(err)
+		}
 	}
 
 	// Go to next middleware:
