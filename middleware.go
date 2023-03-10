@@ -1,6 +1,8 @@
 package inertia
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,6 +20,8 @@ func (i *Inertia) Middleware(c *fiber.Ctx) error {
 	sess, _ := i.store.Get(c)
 
 	flash := sess.Get("flash")
+
+	fmt.Println(flash)
 
 	i.Share("flash", nil)
 
